@@ -1,4 +1,5 @@
 from random import randint
+from os import path,system
 
 def pick_capital():
     '''
@@ -6,16 +7,18 @@ def pick_capital():
     Returns:
     str: The name of European capital
     '''
+    dirpath = path.dirname(__file__)
+    filename = "capital.txt"
+    filepath = dirpath + '/' + filename
+
     capital_list = []
     
     with open('capital.txt', 'r') as read_capital:
         for line in read_capital:
             capital_list.append(line)
     draw_random_index = randint(0, len(capital_list)-1)
-    capital_to_guess = str(capital_list[draw_random_index]).upper()
+    capital_to_guess = str(capital_list[draw_random_index]).upper().strip()
     return capital_to_guess
-
-print(pick_capital())
 
 def get_hashed(word):
     '''
@@ -50,12 +53,12 @@ def uncover(hashed_password, password, letter):
         for index, char in enumerate(password):
             if char == letter:
                 uncovered_hashed_password_list[index * 2] = letter
-            uncovered_hashed_password = ''.join(uncovered_hashed_password_list)
+        uncovered_hashed_password = ''.join(uncovered_hashed_password_list)
         return uncovered_hashed_password
     elif len(letter) == len(password):
         return letter
     else:
-        return 'Jesteś idiotą.'
+        return hashed_password
 
 
 def update(used_letters, letter):
@@ -66,14 +69,26 @@ def update(used_letters, letter):
     str: The letter to append
     Returns:
     list: The updated list of already used letters
-    '''
-    if letter in used_letters:
-        print('This letter is already used')
-        return used_letters
+    # '''
+    # if(len(letter) == 1):
+    #     if letter in used_letters:
+    #         print('This letter is already used')
+    #         return used_letters
+    #     else:
+    #         used_letters.append(letter)
+    #         return used_letters
+    # else:
+    #     return used_letters
+    if len(letter) == 1:
+        if letter not in used_letters:
+            used_letters.append(letter)
+            return used_letters
+        else:
+            print('This letter is already used!')
+            return used_letters
     else:
-        return used_letters.append(letter)
-    pass
-
+        return used_letters
+ 
 
 def is_win(uncovered_hashed_password, password):
     '''
@@ -84,7 +99,13 @@ def is_win(uncovered_hashed_password, password):
     Returns:
     bool:
     '''
-    if(uncovered_hashed_password == password):
+    no_whitespace_password = ''
+    for letter in uncovered_hashed_password:
+        if(letter.isalpha()):
+            no_whitespace_password += letter
+
+    if(no_whitespace_password == password):
+        print('You win')
         return True
     else:
         return False
@@ -99,6 +120,7 @@ def is_loose(life_points):
     bool: True if life point is equal 0, False otherwise
     '''
     if life_points == 0:
+        print('You loose')
         return True
     else:
         return False
@@ -117,11 +139,38 @@ def get_input():
     else:  
         return 'Please input a letter'
 
-print(get_input())
-
 def main():
-    pass
+    life_points = 3
+    used_letters = []
+    print('WELCOME TO HANGMAN')
+    print('guess a capitol')
+    random_capital = pick_capital()
+    print(random_capital)
+    hashed_capitol = get_hashed(random_capital)
+    print(hashed_capitol + '\n')
+    uncovered_password = hashed_capitol
+    stop_game = True
 
+    while(stop_game != is_loose(life_points) and stop_game != is_win(uncovered_password,random_capital)):
+        print("You have %d try" % life_points)
+        user_input = get_input()
+        if(user_input in used_letters):
+            life_points -= 1
+        elif(user_input != random_capital and len(user_input) == len(random_capital)):
+            life_points -= 1
+            continue
+        elif(len(user_input) > 1 and len(user_input) < len(random_capital) ):
+            life_points -= 1
 
+        check_win = is_win(uncovered_password, user_input)
+        used_letters = update(used_letters, user_input)
+        uncovered_password = uncover(uncovered_password, random_capital, user_input)
+        print(uncovered_password)
+        print('Letters already used: ' + ' '.join(used_letters))
+        
+            
+        
+
+        
 if __name__ == '__main__':
     main()
