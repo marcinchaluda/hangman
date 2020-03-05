@@ -1,5 +1,8 @@
 from random import randint
 from os import path,system
+import time
+import pyfiglet
+import draw_a_hangman as drawing
 
 def pick_capital():
     '''
@@ -59,6 +62,7 @@ def uncover(hashed_password, password, letter):
         return letter
     else:
         return hashed_password
+   
 
 
 def update(used_letters, letter):
@@ -70,15 +74,6 @@ def update(used_letters, letter):
     Returns:
     list: The updated list of already used letters
     # '''
-    # if(len(letter) == 1):
-    #     if letter in used_letters:
-    #         print('This letter is already used')
-    #         return used_letters
-    #     else:
-    #         used_letters.append(letter)
-    #         return used_letters
-    # else:
-    #     return used_letters
     if len(letter) == 1:
         if letter not in used_letters:
             used_letters.append(letter)
@@ -132,15 +127,20 @@ def get_input():
     Returns:
     str: The validated input
     '''
-    user_input = str(input('Choose a letter: ').upper())
+    user_input = input('Choose a letter: ').upper()
+    letter = user_input.isalpha()
 
-    if user_input.isalpha():
-        return user_input
-    else:  
-        return 'Please input a letter'
+    while(letter == False):
+        system('clear')
+        print('Please input a letter')
+        user_input = input('Choose a letter: ').upper()
+        letter = user_input.isalpha()
+    return user_input
+    
 
 def main():
-    life_points = 3
+    system('clear')
+    life_points = 6
     used_letters = []
     print('WELCOME TO HANGMAN')
     print('guess a capitol')
@@ -153,24 +153,26 @@ def main():
 
     while(stop_game != is_loose(life_points) and stop_game != is_win(uncovered_password,random_capital)):
         print("You have %d try" % life_points)
+        print(drawing.draw_a_hangman()[life_points])
         user_input = get_input()
-        if(user_input in used_letters):
-            life_points -= 1
-        elif(user_input != random_capital and len(user_input) == len(random_capital)):
+        if(user_input == random_capital):
+            print('You win')
+            break
+        elif(len(user_input) == len(random_capital)):
             life_points -= 1
             continue
+        if(user_input not in used_letters and user_input not in random_capital):
+            life_points -= 1
         elif(len(user_input) > 1 and len(user_input) < len(random_capital) ):
             life_points -= 1
-
+  
+        system('clear')
         check_win = is_win(uncovered_password, user_input)
         used_letters = update(used_letters, user_input)
         uncovered_password = uncover(uncovered_password, random_capital, user_input)
         print(uncovered_password)
         print('Letters already used: ' + ' '.join(used_letters))
-        
-            
-        
+    print(drawing.draw_a_hangman()[life_points])
 
-        
 if __name__ == '__main__':
     main()
