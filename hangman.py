@@ -100,7 +100,7 @@ def is_win(uncovered_hashed_password, password):
             no_whitespace_password += letter
 
     if(no_whitespace_password == password):
-        print('You win')
+        print(pyfiglet.figlet_format('You win'))
         return True
     else:
         return False
@@ -115,7 +115,7 @@ def is_loose(life_points):
     bool: True if life point is equal 0, False otherwise
     '''
     if life_points == 0:
-        print('You loose')
+        print(pyfiglet.figlet_format('You loose'))
         return True
     else:
         return False
@@ -156,7 +156,7 @@ def main():
         print(drawing.draw_a_hangman()[life_points])
         user_input = get_input()
         if(user_input == random_capital):
-            print('You win')
+            print(pyfiglet.figlet_format('You win'))
             break
         elif(len(user_input) == len(random_capital)):
             life_points -= 1
